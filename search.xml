@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title>TextRank</title>
+      <link href="2020/11/05/TextRank/"/>
+      <url>2020/11/05/TextRank/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>论文名称： <strong>TextRank: Bringing Order into Texts</strong></p><p>TextRank是一个很经典的NLP的方法，主要是用来获得一段文字的关键词。</p><p>TextRank思想非常简单：通过词之间的相邻关系构建网络，然后用<a href="https://link.zhihu.com/?target=http://www.cnblogs.com/en-heng/p/6124526.html">PageRank</a>迭代计算每个节点的rank值，排序rank值即可得到关键词。PageRank本来是用来解决网页排名的问题，网页之间的链接关系即为图的边，迭代计算公式如下：</p><p><img src="https://i.loli.net/2020/11/05/D15XNRwBeZdFjUP.png" alt="img"></p><p>其中，PR(Vi)表示结点Vi的rank值，In(Vi)表示结点Vi的前驱结点集合，Out(Vj)表示结点Vj的后继结点集合，d为damping factor用于做平滑。</p><p>网页之间的链接关系可以用图表示，那么怎么把一个句子（可以看作词的序列）构建成图呢？TextRank将某一个词与其前面的N个词、以及后面的N个词均具有图相邻关系（类似于N-gram语法模型）。具体实现：设置一个长度为N的滑动窗口，所有在这个窗口之内的词都视作词结点的相邻结点；则TextRank构建的词图为无向图。下图给出了由一个文档构建的词图（去掉了停用词并按词性做了筛选）：</p><p><img src="https://i.loli.net/2020/11/05/wr6z4e5ARTS7blp.png" alt="image-20201105153948032"></p><p>考虑到不同词对可能有不同的共现（co-occurrence），TextRank将共现作为无向图边的权值。那么，TextRank的迭代计算公式如下：</p><p><img src="https://i.loli.net/2020/11/05/VMPzyLU2gnO1SBx.png" alt="img"></p><p>可以看出，该公式仅仅比PageRank多了一个权重项Wji，用来表示两个节点之间的边连接有不同的重要程度。</p><p>在这里算是简单说明了TextRank的内在原理，以下对其关键词提取应用做进一步说明。</p><p>TextRank用于关键词提取的算法如下：</p><p>（1）把给定的文本T按照完整句子进行分割，即</p><p><img src="https://i.loli.net/2020/11/05/w9dQLKUB32cVEON.png" alt="img"></p><p>（2）对于每个句子Si属于T，进行分词和词性标注处理，并过滤掉停用词，只保留指定词性的单词，如名词、动词、形容词，即</p><p><img src="https://i.loli.net/2020/11/05/myLE6KxS4DOrAwQ.jpg" alt="img"></p><p>，其中 ti,j 是保留后的候选关键词。</p><p>（3）构建候选关键词图G = (V,E)，其中V为节点集，由（2）生成的候选关键词组成，然后采用共现关系（co-occurrence）构造任两点之间的边，两个节点之间存在边仅当它们对应的词汇在长度为K的窗口中共现，K表示窗口大小，即最多共现K个单词。</p><p>（4）根据上面公式，迭代传播各节点的权重，直至收敛。</p><p>（5）对节点权重进行倒序排序，从而得到最重要的T个单词，作为候选关键词。</p><p>（6）由5得到最重要的T个单词，在原始文本中进行标记，若形成相邻词组，则组合成多词关键词。</p><p>2.1 TextRank算法提取关键词短语</p><p>　　提取关键词短语的方法基于关键词提取，可以简单认为：如果提取出的若干关键词在文本中相邻，那么构成一个被提取的关键短语。</p><p>2.2 TextRank生成摘要</p><p>　　将文本中的每个句子分别看做一个节点，如果两个句子有相似性，那么认为这两个句子对应的节点之间存在一条无向有权边。考察句子相似度的方法是下面这个公式：</p><p><img src="https://i.loli.net/2020/11/05/KqcCLrEXMFuO7fk.png" alt="img"></p><p>公式中，Si,Sj分别表示两个句子词的个数总数，Wk表示句子中的词，那么分子部分的意思是同时出现在两个句子中的同一个词的个数，分母是对句子中词的个数求对数之和。分母这样设计可以遏制较长的句子在相似度计算上的优势。</p><p>我们可以根据以上相似度公式循环计算任意两个节点之间的相似度，根据阈值去掉两个节点之间相似度较低的边连接，构建出节点连接图，然后计算TextRank值，最后对所有TextRank值排序，选出TextRank值最高的几个节点对应的句子作为摘要。</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>KSVD</title>
       <link href="2020/10/31/KSVD/"/>
       <url>2020/10/31/KSVD/</url>
